@@ -36,17 +36,17 @@
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
-**/CMakeFiles/
+# **/CMakeFiles/
 
 CMakeScripts
 Testing
 
 Makefile
-**/Makefile
+# **/Makefile
 
 cmake_install.cmake
 *.cmake
-**/cmake_install.cmake
+# **/cmake_install.cmake
 
 install_manifest.txt
 compile_commands.json
