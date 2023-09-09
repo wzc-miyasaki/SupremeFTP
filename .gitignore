@@ -39,8 +39,24 @@ CMakeScripts
 Testing
 Makefile
 cmake_install.cmake
+*.cmake
 **/cmake_install.cmake
 install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+
+# Ignore IDE-specific files (like for CLion, Visual Studio Code, etc.)
+.idea/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Temporary files
+*.log
+*.swp
+*.bak
+*.tmp
+*~
