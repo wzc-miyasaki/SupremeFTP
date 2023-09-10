@@ -42,15 +42,16 @@ int main(int argc, char const *argv[]){
     if ((clientSocket = socket(AF_INET, SOCK_DGRAM, 0)) == -1)
         cout <<  "Client Error: socket" << endl;
 
-    // Setting the timeout for recvfrom
-    struct timeval tv;
-    tv.tv_sec = 5;  // 5 seconds timeout
-    tv.tv_usec = 0; // 0 microseconds
-    if(setsockopt(clientSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
-        std::cerr << "Error setting timeout!" << std::endl;
-        close(clientSocket);
-        exit(-1);
-    }
+    // // Setting the timeout for recvfrom
+    // struct timeval tv;
+    // tv.tv_sec = 5;  // 5 seconds timeout
+    // tv.tv_usec = 0; // 0 microseconds
+    // if(setsockopt(clientSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
+    //     std::cerr << "Error setting timeout!" << std::endl;
+    //     close(clientSocket);
+    //     exit(-1);
+    // }
+    
     // read user input filename
     char nameBuffer[50];
     char filename[20];
