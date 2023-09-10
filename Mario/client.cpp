@@ -42,16 +42,6 @@ int main(int argc, char const *argv[]){
     if ((clientSocket = socket(AF_INET, SOCK_DGRAM, 0)) == -1)
         cout <<  "Client Error: socket" << endl;
 
-    // // Setting the timeout for recvfrom
-    // struct timeval tv;
-    // tv.tv_sec = 5;  // 5 seconds timeout
-    // tv.tv_usec = 0; // 0 microseconds
-    // if(setsockopt(clientSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
-    //     std::cerr << "Error setting timeout!" << std::endl;
-    //     close(clientSocket);
-    //     exit(-1);
-    // }
-    
     // read user input filename
     char nameBuffer[50];
     char filename[20];
@@ -142,12 +132,23 @@ int main(int argc, char const *argv[]){
         }
     }
 
+    // Setting the timeout for recvfrom
+    struct timeval tv;
+    tv.tv_sec = 5;  // 5 seconds timeout
+    tv.tv_usec = 0; // 0 microseconds
+    if(setsockopt(clientSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
+        std::cerr << "Error setting timeout!" << std::endl;
+        close(clientSocket);
+        exit(-1);
+    }
+
     if (numOfLoss > 0) {
         cout << "Loss detected, start retransmission" << endl;
 
         for (int i = 1; i <= packet_count && numOfLoss > 0; i++) {
             while (ack[i] == 0) { 
                 memset (&packet, 0, sizeof (packet));
+                cout << "requesting " << i << endl; 
                 sendto(clientSocket, &i, sizeof(i), 0, (struct sockaddr *)&server_addr, sizeof(server_addr));
                 recvfrom(clientSocket, &packet, sizeof(packet), 0, (struct sockaddr *)&client_addr, (socklen_t *)&length);
 
@@ -156,13 +157,12 @@ int main(int argc, char const *argv[]){
                     cout << "Retransmission packet " << i << " received" << endl;
                     memcpy(&cache[(packet.packet_seq - 1) * packet.length], packet.data, packet.length);
                     numOfLoss--;
-
+                    ack[i] = 1;
                     // all packets received, send close signal to server
                     if (numOfLoss == 0) {
                         int closeSingal = 0;
                         sendto(clientSocket, &closeSingal, sizeof(closeSingal), 0, (struct sockaddr *)&server_addr, sizeof(server_addr));
                     }
-                    break; 
                 }
             }
         }
