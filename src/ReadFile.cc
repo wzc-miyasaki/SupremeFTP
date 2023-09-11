@@ -17,3 +17,16 @@ void ReadFileWithRange(const std::string &filePath, const int pos, const int num
     file.read(buf, numBytes);
     file.close();
 }
+
+long int getFileSize(const std::string& filePath)
+{
+    std::ifstream file(filePath, std::ios::ate | std::ios::binary);  // Open at end of file in binary mode
+
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open the file & get the size of it. ");
+    }
+
+    long long fileSize = file.tellg();  // get position, which is the file size
+    file.close();
+    return fileSize;
+}

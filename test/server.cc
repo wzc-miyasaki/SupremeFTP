@@ -10,6 +10,7 @@
 #include <stdbool.h>
 
 #include <iostream> 
+#include "ReadFile/ReadFile.h"
 using namespace std;
 
 #define BUFFER_SIZE 9000 // maximum number of bytes that can be sent without receiving an ACK
@@ -50,11 +51,10 @@ int main(int argc, char **argv){
 
     char recvBuffer [BUFFER_SIZE];
     // Requested file info 
-    char filename [20];
+    char filename [64];
     long int fileSize;
     long int packet_count = 0;
-    FILE *fptr;
-    char *cache;
+
     for (;;) {
         cout << "Waiting for initial request" << endl;
         memset (recvBuffer, 0, sizeof(recvBuffer));
@@ -65,27 +65,14 @@ int main(int argc, char **argv){
         length = sizeof(client_addr);
         if((recvStatus = recvfrom(serverSocket, recvBuffer, BUFFER_SIZE, 0, (struct sockaddr*) &client_addr, (socklen_t *) &length)) == -1){
             cout << ("Server error: receive") << endl;
-        } 
-        
-        // try to open the file
-        sscanf (recvBuffer, "%s", filename);
-        cout << "Client Request: " << filename << endl; 
-        fptr = fopen (filename, "rb");
-
-        if (fptr==NULL){
-            cout << "File open failed: File name does not exist" << endl;
-            continue;
+        } else {
+            cout << "recv : " << recvStatus << endl;
         }
-
+        
         // calculate fileSize
-        fseek(fptr, 0, SEEK_END);
-        fileSize = ftell(fptr);
-        rewind(fptr);
-    
-        // read file to Cache
-        cache = new char[fileSize+1];
-        fread(cache, fileSize, 1, fptr);
-        rewind(fptr);
+        strcpy(filename, recvBuffer);
+        cout << "filename is : " << filename << endl;
+        fileSize = getFileSize(filename);
 
         // check for amount of packet
         if ((fileSize % BUFFER_SIZE) != 0){
@@ -128,9 +115,11 @@ int main(int argc, char **argv){
                 data_length = BUFFER_SIZE;
             }
 
-            // fill packet and send
-            memcpy(packet.data, &cache[data_offset], data_length);
+            // read data from a specific range and fill packet 
+            ReadFileWithRange(filename, data_offset, data_length, packet.data);
             packet.length = data_length;
+
+            // Send packet
             sendto(serverSocket, &(packet), sizeof(packet), 0, (struct sockaddr *) &client_addr, sizeof(client_addr));
             cout << "Packet " << curCount << " sent with length " << packet.length << endl;
 
@@ -172,16 +161,13 @@ int main(int argc, char **argv){
             }
 
             // Read requested data and send to client.
-            memcpy(packet.data, &cache[data_offset], data_length);
+            ReadFileWithRange(filename, data_offset, data_length, packet.data);
             packet.packet_seq = ackSeq;
             packet.length = data_length;
 
             sendto (serverSocket, &(packet), sizeof (packet), 0, (struct sockaddr *) &client_addr, sizeof (client_addr));
             cout << "resent packet " << packet.packet_seq << endl; 
         }
-
-        fclose(fptr);
-    
     }
     close(serverSocket);
 }
