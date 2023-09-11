@@ -124,8 +124,8 @@ int main(int argc, char const *argv[]){
 
     // Setting the timeout for recvfrom
     struct timeval tv;
-    tv.tv_sec = 5;  // 5 seconds timeout
-    tv.tv_usec = 0; // 0 microseconds
+    tv.tv_sec = 0;  // 5 seconds timeout
+    tv.tv_usec = 5000; // 0 microseconds
     if(setsockopt(clientSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
         std::cerr << "Error setting timeout!" << std::endl;
         close(clientSocket);
