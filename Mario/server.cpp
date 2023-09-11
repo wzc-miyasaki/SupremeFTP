@@ -145,9 +145,7 @@ int main(int argc, char **argv){
         cout << "Start retransmission Seesion" << endl; 
         long int ackSeq = 0L; 
         
-        int dropTest = 1; 
         while(true){
-            dropTest ++; 
 
             memset(&packet, 0, sizeof(packet));
             memset(&ackSeq, 0, sizeof(ackSeq));
@@ -158,10 +156,7 @@ int main(int argc, char **argv){
                 exit(0);
                 break;
             }
-            if(dropTest % 3 == 0){
-                cout << "Retrans drop" << ackSeq << endl; 
-                continue;
-            }
+
             // Determine the size and location of the requested data.
             size_t data_offset;
             size_t data_length;

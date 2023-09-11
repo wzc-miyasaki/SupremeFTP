@@ -90,21 +90,11 @@ int main(int argc, char const *argv[]){
         ack[i]=0;
     }
 
-    // lossCount: mimic the packet loss situtation 
-    // Remove
-    int lossCount = 2; 
     int receivedCount = 0; 
     while(true){
-        // Remove
-        lossCount++; 
-        
         memset(&packet, 0, sizeof (packet));
         recvfrom(clientSocket, &(packet), sizeof(packet), 0, (struct sockaddr *) &client_addr, (socklen_t *) &length);
         receivedCount++; 
-        // Remove
-        if(lossCount % 51 == 0){
-            continue;
-        }
 
         ack[packet.packet_seq] = 1; 
         cout << "Packet " << packet.packet_seq << " received, length " << packet.length << endl;
