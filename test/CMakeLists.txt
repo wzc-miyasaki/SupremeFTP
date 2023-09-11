@@ -6,4 +6,8 @@ add_executable(client client.cc)
 
 target_link_libraries(main PRIVATE networkanalyzer)
 target_link_libraries(main PRIVATE readfile)
+
 target_link_libraries(server PRIVATE readfile)
+target_link_libraries(server PRIVATE networkanalyzer)
+
+target_link_libraries(client PRIVATE networkanalyzer)

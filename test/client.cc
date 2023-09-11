@@ -10,6 +10,8 @@
 #include <time.h> 
 #include <iostream> 
 
+#include "NetworkAnalyzer/NetworkAnalyzer.h"
+
 using namespace std;
 
 #define BUFFER_SIZE 1450
@@ -41,6 +43,11 @@ int main(int argc, char const *argv[]){
     int clientSocket; 
     if ((clientSocket = socket(AF_INET, SOCK_DGRAM, 0)) == -1)
         cout <<  "Client Error: socket" << endl;
+
+    // Measure the RTT
+    double rtt = RequestRttMeasure(clientSocket, client_addr, server_addr);
+    cout << "RTT is : " << rtt << "s" << endl;
+
 
     // read user input filename
     char nameBuffer[50];

@@ -11,6 +11,8 @@
 
 #include <iostream> 
 #include "ReadFile/ReadFile.h"
+#include "NetworkAnalyzer/NetworkAnalyzer.h"
+
 using namespace std;
 
 #define BUFFER_SIZE 1450 // maximum number of bytes that can be sent without receiving an ACK
@@ -55,11 +57,14 @@ int main(int argc, char **argv){
     long int fileSize;
     long int packet_count = 0;
 
+    // Reponse to RTT Measure Request from the client.
+    ResponseRttMeasure(serverSocket, client_addr);
+
     for (;;) {
         cout << "Waiting for initial request" << endl;
         memset (recvBuffer, 0, sizeof(recvBuffer));
         memset (filename, 0, sizeof (filename)) ;
-        
+
         // read requested file name
         ssize_t recvStatus; 
         length = sizeof(client_addr);
