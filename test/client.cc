@@ -12,7 +12,7 @@
 
 using namespace std;
 
-#define BUFFER_SIZE 9000
+#define BUFFER_SIZE 1450
 
 // Define packet structure to be sent over the network
 struct packet_struct {

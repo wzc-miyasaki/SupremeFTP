@@ -13,7 +13,7 @@
 #include "ReadFile/ReadFile.h"
 using namespace std;
 
-#define BUFFER_SIZE 9000 // maximum number of bytes that can be sent without receiving an ACK
+#define BUFFER_SIZE 1450 // maximum number of bytes that can be sent without receiving an ACK
 
 struct packet_def {
     long int packet_seq;
