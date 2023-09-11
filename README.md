@@ -28,4 +28,9 @@ make
 ```
 这样整个程序就被安装在 build 目录下，如果安装成功，`build/test/` 目录下应该有一个 `main` executable file，该文件用于测试，可返回当前 hostname.
 
+To build for debug in CMake, run cmake like this:
+```bash
+cmake -DCMAKE_BUILD_TYPE=Debug <path>
+```
+
 A good CMake tutorial video link:  [here](https://youtu.be/AJRGU_XgVMQ)
