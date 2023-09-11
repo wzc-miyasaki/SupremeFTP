@@ -91,11 +91,11 @@ int main(int argc, char **argv){
 
         // send header packet to client 
         sendto(serverSocket, &(packet_count), sizeof(packet_count), 0, (struct sockaddr *) &client_addr, sizeof (client_addr));
-        usleep (1000);
+        usleep (10000);
         sendto(serverSocket, &(fileSize), sizeof(fileSize), 0, (struct sockaddr *) &client_addr, sizeof (client_addr));
+        cout << "packet_count " << packet_count << endl; 
         cout << "file size: " << fileSize << endl; 
-        usleep (1000);
-        
+        usleep (10000);
         // transmit the file to client
         long int curCount = 1;
         while(curCount <= packet_count){
@@ -128,6 +128,7 @@ int main(int argc, char **argv){
                 break;
             }
             curCount++; 
+            // usleep (20);   // flow control, too slow
         }
         
         // check for retransmission 

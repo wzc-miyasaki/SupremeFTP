@@ -10,7 +10,6 @@ option(BUILD_TEST "whether or not to build test" ON)
 if(BUILD_TEST)
     message(STATUS "building the tests ...")
     add_subdirectory(test)
-    add_subdirectory(Mario)
 endif()
 
 
