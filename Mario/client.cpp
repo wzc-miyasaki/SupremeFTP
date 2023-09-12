@@ -12,7 +12,7 @@
 
 using namespace std;
 
-#define BUFFER_SIZE 9000
+#define BUFFER_SIZE 1450
 
 // Define packet structure to be sent over the network
 struct packet_struct {
@@ -62,9 +62,13 @@ int main(int argc, char const *argv[]){
     ssize_t length;
     long int filesize = 0;
     long int packet_count = 0;
+    printf("1\n");
     recvfrom(clientSocket, &(packet_count), sizeof (packet_count), 0, (struct sockaddr *) &client_addr, (socklen_t *) &length);
+    
     recvfrom(clientSocket, &(filesize), sizeof (filesize), 0, (struct sockaddr *) &client_addr, (socklen_t *) &length);
-
+    printf("2\n");
+    cout << "filesize: " << filesize << endl; 
+    cout << "packet_count: " << packet_count << endl; 
     // calculate stat of the file
     long int lastPackSize;
     int allSameSize = 0;
@@ -76,9 +80,9 @@ int main(int argc, char const *argv[]){
 
     char *cache;
     cache = new char[filesize + 1];
-    cout << "filesize: " << filesize << endl; 
+    // cout << "filesize: " << filesize << endl; 
     time (&start);
-
+    printf("3\n");
     FILE *fptr; 
     // fptr = fopen(filename, "wb");
     fptr = fopen("copy.txt", "wb");
@@ -125,7 +129,7 @@ int main(int argc, char const *argv[]){
     // Setting the timeout for recvfrom
     struct timeval tv;
     tv.tv_sec = 0;  // 5 seconds timeout
-    tv.tv_usec = 5000; // 0 microseconds
+    tv.tv_usec = 2000; // 0 microseconds
     if(setsockopt(clientSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
         std::cerr << "Error setting timeout!" << std::endl;
         close(clientSocket);
@@ -171,6 +175,7 @@ int main(int argc, char const *argv[]){
     double diff;
     diff = difftime(end, start);
     cout << "Time consumed: " << diff << endl; 
+    cout << "loss rate" << static_cast<double>(numOfLoss) / packet_count << endl; 
 
     fclose(fptr);
     close(clientSocket);
