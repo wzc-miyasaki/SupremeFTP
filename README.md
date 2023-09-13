@@ -3,6 +3,12 @@
 EE542 Lab4  Fast, Reliable File Transfer
 
 
+#### Some useful Commands
+Generate a file filled with random bites:
+```
+dd if=/dev/urandom of=data.bin bs=1M count=1024
+```
+
 
 #### Install CMake
 
