@@ -8,6 +8,10 @@ Generate a file filled with random bites:
 ```
 dd if=/dev/urandom of=data.bin bs=1M count=1024
 ```
+Check OS memory
+```
+vim /proc/meminfo
+```
 
 
 #### Install CMake
