@@ -21,6 +21,7 @@ struct packet_struct {
     long int packet_seq;       // Unique ID for each packet
     long int length;         // Length of data in the packet
     char data[BUFFER_SIZE];  // Data contained in the packet
+    long int file_size; 
 };
 
 int main(int argc, char const *argv[]){
@@ -69,8 +70,10 @@ int main(int argc, char const *argv[]){
     long int filesize = 0;
     long int packet_count = 0;
 
-    recvfrom(clientSocket, &(packet_count), sizeof (packet_count), 0, (struct sockaddr *) &client_addr, (socklen_t *) &length);
-    recvfrom(clientSocket, &(filesize), sizeof (filesize), 0, (struct sockaddr *) &client_addr, (socklen_t *) &length);
+    // recvfrom(clientSocket, &(packet_count), sizeof (packet_count), 0, (struct sockaddr *) &client_addr, (socklen_t *) &length);
+    recvfrom(clientSocket, &(packet), sizeof(packet), 0, (struct sockaddr *) &client_addr, (socklen_t *) &length);
+    filesize = packet.file_size;
+    packet_count = filesize/BUFFER_SIZE + (filesize%BUFFER_SIZE == 0 ? 0 : 1);
     cout << "filesize: " << filesize << endl; 
     cout << "packet_count: " << packet_count << endl; 
 

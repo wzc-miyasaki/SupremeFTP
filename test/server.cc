@@ -21,6 +21,7 @@ struct packet_def {
     long int packet_seq;
     long int length;
     char data[BUFFER_SIZE];
+    long int file_size; 
 };
 
 // 0: evenly partitioned, every packet same size 1: not same size
@@ -93,14 +94,20 @@ int main(int argc, char **argv){
         }
 
         cout << "Total number of packet: " << packet_count << endl;
-
+        memset(&packet, 0, sizeof(packet));
+        packet.packet_seq = -1; 
+        packet.length = -1;
+        packet.file_size = fileSize;
         // send header packet to client 
-        sendto(serverSocket, &(packet_count), sizeof(packet_count), 0, (struct sockaddr *) &client_addr, sizeof (client_addr));
+        // sendto(serverSocket, &(packet_count), sizeof(packet_count), 0, (struct sockaddr *) &client_addr, sizeof (client_addr));
+        sendto(serverSocket, &(packet), sizeof(packet), 0, (struct sockaddr *) &client_addr, sizeof(client_addr));
+
         usleep (10000);
-        sendto(serverSocket, &(fileSize), sizeof(fileSize), 0, (struct sockaddr *) &client_addr, sizeof (client_addr));
+        // sendto(serverSocket, &(fileSize), sizeof(fileSize), 0, (struct sockaddr *) &client_addr, sizeof (client_addr));
         cout << "packet_count " << packet_count << endl; 
         cout << "file size: " << fileSize << endl; 
-        usleep (10000);
+
+        // usleep (10000);
         // transmit the file to client
         long int curCount = 1;
         while(curCount <= packet_count){
@@ -123,7 +130,7 @@ int main(int argc, char **argv){
             // read data from a specific range and fill packet 
             ReadFileWithRange(filename, data_offset, data_length, packet.data);
             packet.length = data_length;
-
+            packet.file_size = fileSize;
             // Send packet
             sendto(serverSocket, &(packet), sizeof(packet), 0, (struct sockaddr *) &client_addr, sizeof(client_addr));
             cout << "Packet " << curCount << " sent with length " << packet.length << endl;
