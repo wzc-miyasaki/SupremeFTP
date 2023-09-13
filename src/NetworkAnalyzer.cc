@@ -4,7 +4,7 @@
 #include <cstring>   // for strerror
 #include <cerrno>    // for errno
 #include <sys/socket.h>
-
+#include <arpa/inet.h>
 #include <chrono>
 
 void WhatsMyHostname()
@@ -43,4 +43,11 @@ void ResponseRttMeasure(const int &sockfd, sockaddr_in trg)
 
     int status = recvfrom(sockfd, &(buffer), sizeof(buffer), 0, (struct sockaddr *) &trg, (socklen_t *) &length);
     status = sendto(sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *) &trg, sizeof(trg));
+}
+
+void FillAddress(struct sockaddr_in& trg, const char* ip, const char* port)
+{
+    trg.sin_family = AF_INET;
+    trg.sin_port = htons(atoi(port));
+    trg.sin_addr.s_addr = inet_addr(ip);
 }

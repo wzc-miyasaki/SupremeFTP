@@ -36,9 +36,8 @@ int main(int argc, char const *argv[]){
     struct sockaddr_in server_addr, client_addr;
 
     // set network
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(atoi(argv[2]));
-    server_addr.sin_addr.s_addr = inet_addr(argv[1]);
+    FillAddress(server_addr, argv[1], argv[2]);
+
 
     int clientSocket; 
     if ((clientSocket = socket(AF_INET, SOCK_DGRAM, 0)) == -1)
@@ -50,32 +49,31 @@ int main(int argc, char const *argv[]){
 
 
     // read user input filename
-    char nameBuffer[50];
-    char filename[20];
-    cout << "Enter the filename you want to download: \n"; 
-    scanf (" %[^\n]%*c", nameBuffer);
-    sscanf (nameBuffer, "%s", filename);
+    std::string filename;
+    std::cout << "Enter the filename you want to download: " << std::endl;
+    std::getline(std::cin, filename);
 
-    if(strlen(filename) == 0){
+    if(filename.empty()){
         cout << "no input string" << endl;
         exit(-1);
     }
 
     // Send request to server
+    const char *nameBuffer = filename.c_str();
     if (sendto(clientSocket, nameBuffer, sizeof (nameBuffer), 0, (struct sockaddr *) &server_addr, sizeof(server_addr)) == -1) 
         cout << "Client Error: send" << endl;
 
+    // TODO:  Provide reliable tranfer to ensure filesize & packet_count has been received
     // Receive file info
     ssize_t length;
     long int filesize = 0;
     long int packet_count = 0;
-    printf("1\n");
+
     recvfrom(clientSocket, &(packet_count), sizeof (packet_count), 0, (struct sockaddr *) &client_addr, (socklen_t *) &length);
-    
     recvfrom(clientSocket, &(filesize), sizeof (filesize), 0, (struct sockaddr *) &client_addr, (socklen_t *) &length);
-    printf("2\n");
     cout << "filesize: " << filesize << endl; 
     cout << "packet_count: " << packet_count << endl; 
+
     // calculate stat of the file
     long int lastPackSize;
     int allSameSize = 0;
