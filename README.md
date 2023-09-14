@@ -2,7 +2,8 @@
 
 EE542 Lab4  Fast, Reliable File Transfer
 
-
+&nbsp;
+&nbsp;
 #### Some useful Commands
 Generate a file filled with random bites:
 ```
@@ -19,6 +20,8 @@ git checkout <your_local_branch_Name>
 git push --set-upstream origin <your_local_branch_Name>
 ```
 
+&nbsp;
+&nbsp;
 #### Install CMake
 
 ```bash
@@ -26,8 +29,8 @@ sudo apt update && sudo apt upgrade
 sudo apt install cmake
 ```
 
-
-
+&nbsp;
+&nbsp;
 #### Build the project
 
 Create a directory named `build` at root directory `SupremeFTP/`.  Then `cd build/`. To build the project using CMake, us the following command
