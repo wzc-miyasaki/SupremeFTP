@@ -11,6 +11,7 @@ add_executable(client client.cc)
 add_executable(mixServer selectSocket.cc)
 add_executable(mixTCPclient tcpclient.cc)
 add_executable(mixUDPclient udpclient.cc)
+add_executable(fatClient fatclient.cc)
 
 
 # Link Library
