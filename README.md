@@ -13,6 +13,11 @@ Check OS memory
 vim /proc/meminfo
 ```
 
+To push the current branch and set the remote as upstream, use
+```git
+git checkout <your_local_branch_Name>
+git push --set-upstream origin <your_local_branch_Name>
+```
 
 #### Install CMake
 
