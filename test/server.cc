@@ -59,7 +59,7 @@ int main(int argc, char **argv){
     long int packet_count = 0;
 
     // Reponse to RTT Measure Request from the client.
-    ResponseRttMeasure(serverSocket, client_addr);
+    // ResponseRttMeasure(serverSocket, client_addr);
 
     for (;;) {
         cout << "Waiting for initial request" << endl;
@@ -133,6 +133,9 @@ int main(int argc, char **argv){
             packet.file_size = fileSize;
             // Send packet
             sendto(serverSocket, &(packet), sizeof(packet), 0, (struct sockaddr *) &client_addr, sizeof(client_addr));
+            sendto(serverSocket, &(packet), sizeof(packet), 0, (struct sockaddr *) &client_addr, sizeof(client_addr));
+            
+            
             cout << "Packet " << curCount << " sent with length " << packet.length << endl;
 
             if(packet_count == curCount){
