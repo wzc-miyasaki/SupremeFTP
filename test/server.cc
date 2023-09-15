@@ -8,14 +8,12 @@
 #include <stdlib.h> 
 #include <string.h> 
 #include <stdbool.h>
-
+#include <algorithm>
 #include <iostream> 
 #include "ReadFile/ReadFile.h"
 #include "NetworkAnalyzer/NetworkAnalyzer.h"
 
 using namespace std;
-
-#define BUFFER_SIZE 1450 // maximum number of bytes that can be sent without receiving an ACK
 
 struct packet_def {
     long int packet_seq;
@@ -54,12 +52,12 @@ int main(int argc, char **argv){
 
     char recvBuffer [BUFFER_SIZE];
     // Requested file info 
-    char filename [64];
+    char filename [256];
     long int fileSize;
     long int packet_count = 0;
 
     // Reponse to RTT Measure Request from the client.
-    ResponseRttMeasure(serverSocket, client_addr);
+    // ResponseRttMeasure(serverSocket, client_addr);
 
     for (;;) {
         cout << "Waiting for initial request" << endl;
@@ -107,44 +105,8 @@ int main(int argc, char **argv){
         cout << "packet_count " << packet_count << endl; 
         cout << "file size: " << fileSize << endl; 
 
-        // usleep (10000);
-        // transmit the file to client
-        long int curCount = 1;
-        while(curCount <= packet_count){
-            memset(&packet, 0, sizeof(packet));
-            packet.packet_seq = curCount; 
-            
-            // calculate data offset
-            size_t data_offset;
-            size_t data_length;
-            if(curCount == packet_count && allSameSize != 1) {
-                // Handle the last packet, which might not be BUFFER_SIZE.
-                data_offset = fileSize - lastPackSize;
-                data_length = lastPackSize;
-            } else {
-                // Handle all other packets.
-                data_offset = (curCount - 1) * BUFFER_SIZE;
-                data_length = BUFFER_SIZE;
-            }
-
-            // read data from a specific range and fill packet 
-            ReadFileWithRange(filename, data_offset, data_length, packet.data);
-            packet.length = data_length;
-            packet.file_size = fileSize;
-            // Send packet
-            sendto(serverSocket, &(packet), sizeof(packet), 0, (struct sockaddr *) &client_addr, sizeof(client_addr));
-            cout << "Packet " << curCount << " sent with length " << packet.length << endl;
-
-            if(packet_count == curCount){
-                cout << "Transmission complete" << endl; 
-                break;
-            }
-            curCount++; 
-            // usleep (20);   // flow control, too slow
-        }
         
         // check for retransmission 
-        cout << "Start retransmission Seesion" << endl; 
         long int ackSeq = 0L; 
         
         while(true){
@@ -158,28 +120,34 @@ int main(int argc, char **argv){
                 exit(0);
                 break;
             }
+            long int startIdx = max(ackSeq - packet_count / 100, 1L);
+            long int endIdx = min(ackSeq + 1300, packet_count);
+            for(long int i = ackSeq; i <= endIdx; i++){
+                // Determine the size and location of the requested data.
+                size_t data_offset;
+                size_t data_length;
+                if(i == packet_count && allSameSize != 1) {
+                    // It's the last packet and it's of different size.
+                    data_offset = fileSize - lastPackSize;
+                    data_length = lastPackSize;
+                    cout << "last packet" << endl; 
+                } else {
+                    // Any other packet.
+                    data_offset = (i - 1) * BUFFER_SIZE;
+                    data_length = BUFFER_SIZE;
+                }
 
-            // Determine the size and location of the requested data.
-            size_t data_offset;
-            size_t data_length;
+                // Read requested data and send to client.
+                ReadFileWithRange(filename, data_offset, data_length, packet.data);
+                packet.packet_seq = i;
+                packet.length = data_length;
 
-            if(ackSeq == packet_count && allSameSize != 1) {
-                // It's the last packet and it's of different size.
-                data_offset = fileSize - lastPackSize;
-                data_length = lastPackSize;
-            } else {
-                // Any other packet.
-                data_offset = (ackSeq - 1) * BUFFER_SIZE;
-                data_length = BUFFER_SIZE;
+                sendto (serverSocket, &(packet), sizeof (packet), 0, (struct sockaddr *) &client_addr, sizeof (client_addr));
+                usleep (5);  
+                sendto (serverSocket, &(packet), sizeof (packet), 0, (struct sockaddr *) &client_addr, sizeof (client_addr));
+                // cout << "resent packet " << packet.packet_seq << endl; 
             }
-
-            // Read requested data and send to client.
-            ReadFileWithRange(filename, data_offset, data_length, packet.data);
-            packet.packet_seq = ackSeq;
-            packet.length = data_length;
-
-            sendto (serverSocket, &(packet), sizeof (packet), 0, (struct sockaddr *) &client_addr, sizeof (client_addr));
-            cout << "resent packet " << packet.packet_seq << endl; 
+            
         }
     }
     close(serverSocket);

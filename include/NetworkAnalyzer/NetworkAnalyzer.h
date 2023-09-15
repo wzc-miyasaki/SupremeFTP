@@ -3,6 +3,10 @@
 
 #include <netinet/in.h>
 
+#define BUFFER_SIZE 1450    // maximum number of bytes that can be sent without receiving an ACK
+#define RTT 11000
+
+
 void WhatsMyHostname();
 
 // It measures the RTT using UDP. 
