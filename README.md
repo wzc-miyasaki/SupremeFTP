@@ -20,6 +20,14 @@ git checkout <your_local_branch_Name>
 git push --set-upstream origin <your_local_branch_Name>
 ```
 
+Check && Change the MTU of interface on Linux
+```bash
+sudo up link show dev <interface_Name>
+cat  /sys/class/net/<interface_name>/mtu //or
+
+sudo ip link set dev <interface_Name> mtu 1500 // change MTU
+```
+
 &nbsp;
 &nbsp;
 #### Install CMake
