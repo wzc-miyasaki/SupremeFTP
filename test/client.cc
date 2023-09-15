@@ -70,8 +70,7 @@ int main(int argc, char const *argv[]){
     long int filesize = 0;
     long int packet_count = 0;
 
-    // recvfrom(clientSocket, &(packet_count), sizeof (packet_count), 0, (struct sockaddr *) &client_addr, (socklen_t *) &length);
-    recvfrom(clientSocket, &(packet), sizeof(packet), 0, (struct sockaddr *) &client_addr, (socklen_t *) &length);
+    recvfrom(clientSocket, &(packet), sizeof(packet), 0, (struct sockaddr *) &server_addr, (socklen_t *) &length);
     filesize = packet.file_size;
     packet_count = filesize/BUFFER_SIZE + (filesize%BUFFER_SIZE == 0 ? 0 : 1);
     cout << "filesize: " << filesize << endl; 
@@ -105,7 +104,7 @@ int main(int argc, char const *argv[]){
     int allowFailed = 0;
     while(true){
         memset(&packet, 0, sizeof (packet));
-        if(recvfrom(clientSocket, &(packet), sizeof(packet), 0, (struct sockaddr *) &client_addr, (socklen_t *) &length) == -1){
+        if(recvfrom(clientSocket, &(packet), sizeof(packet), 0, (struct sockaddr *) &server_addr, (socklen_t *) &length) == -1){
             allowFailed++; 
             // if(allowFailed == 0){
             //     break; 
@@ -115,7 +114,7 @@ int main(int argc, char const *argv[]){
         receivedCount++; 
         if(ack[packet.packet_seq] == 1) continue;
         ack[packet.packet_seq] = 1; 
-        // cout << "Packet " << packet.packet_seq << " received, length " << packet.length << endl;
+        cout << "Packet " << packet.packet_seq << " received, length " << packet.length << endl;
 
         if (allSameSize == 1 || packet.packet_seq < packet_count) {
             memcpy(&cache[(packet.packet_seq-1) * packet.length], packet.data, packet.length);
@@ -128,7 +127,7 @@ int main(int argc, char const *argv[]){
             break; 
         }
     }
-
+    usleep (1000);  
     // Retransmission  
     int numOfLoss = 0;
     int initialLoss = 0; 
@@ -143,7 +142,7 @@ int main(int argc, char const *argv[]){
     // Setting the timeout for recvfrom
     struct timeval tv;
     tv.tv_sec = 0;  // 5 seconds timeout
-    tv.tv_usec = 2000; // 0 microseconds
+    tv.tv_usec = 2500; // 0 microseconds
     if(setsockopt(clientSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
         std::cerr << "Error setting timeout!" << std::endl;
         close(clientSocket);
@@ -158,22 +157,26 @@ int main(int argc, char const *argv[]){
                 memset (&packet, 0, sizeof (packet));
                 cout << "requesting " << i << endl; 
                 sendto(clientSocket, &i, sizeof(i), 0, (struct sockaddr *)&server_addr, sizeof(server_addr));
-                if(recvfrom(clientSocket, &packet, sizeof(packet), 0, (struct sockaddr *)&client_addr, (socklen_t *)&length) == -1){
+                if(recvfrom(clientSocket, &packet, sizeof(packet), 0, (struct sockaddr *)&server_addr, (socklen_t *)&length) == -1){
                     cout << "timeout retrans" << endl; 
+                }else{
+                    cout << "success retrans" << endl; 
                 }
-
+                cout << "actuall:  " << packet.packet_seq << " received" << endl;
                 // If the packet sequence is correct, decrease the numOfLoss counter and break out of the while loop
-                if (i == packet.packet_seq) {
+                if (i == packet.packet_seq || ack[packet.packet_seq] == 0) {
                     cout << "Retransmission packet " << i << " received" << endl;
                     memcpy(&cache[(packet.packet_seq - 1) * packet.length], packet.data, packet.length);
                     numOfLoss--;
-                    ack[i] = 1;
+                    ack[packet.packet_seq] = 1;
                     // all packets received, send close signal to server
                     if (numOfLoss == 0) {
                         int closeSingal = 0;
                         sendto(clientSocket, &closeSingal, sizeof(closeSingal), 0, (struct sockaddr *)&server_addr, sizeof(server_addr));
                     }
+                    usleep (10);  
                 }
+                cout << "===========" << endl;
             }
         }
     } else {
@@ -191,7 +194,7 @@ int main(int argc, char const *argv[]){
     double diff;
     diff = difftime(end, start);
     cout << "Time consumed: " << diff << endl; 
-    cout << "loss rate" << static_cast<double>(initialLoss) / packet_count << endl; 
+    cout << "loss rate" << (static_cast<double>(initialLoss) / packet_count )* 100 << endl; 
     cout << "recv loss: " << allowFailed << endl; 
     fclose(fptr);
     close(clientSocket);

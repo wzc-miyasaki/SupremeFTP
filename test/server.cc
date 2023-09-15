@@ -133,8 +133,9 @@ int main(int argc, char **argv){
             packet.file_size = fileSize;
             // Send packet
             sendto(serverSocket, &(packet), sizeof(packet), 0, (struct sockaddr *) &client_addr, sizeof(client_addr));
+            // usleep (5);  
             sendto(serverSocket, &(packet), sizeof(packet), 0, (struct sockaddr *) &client_addr, sizeof(client_addr));
-            
+            usleep (5);  
             
             cout << "Packet " << curCount << " sent with length " << packet.length << endl;
 
@@ -183,6 +184,7 @@ int main(int argc, char **argv){
 
             sendto (serverSocket, &(packet), sizeof (packet), 0, (struct sockaddr *) &client_addr, sizeof (client_addr));
             cout << "resent packet " << packet.packet_seq << endl; 
+            usleep (10);  
         }
     }
     close(serverSocket);
