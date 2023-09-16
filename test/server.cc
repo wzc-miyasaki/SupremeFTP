@@ -26,10 +26,12 @@ struct packet_def {
 int allSameSize = 0; 
 
 int main(int argc, char **argv){
-    if (argc != 2) {
-        cout << "Usage: " << argv[0] <<  " [Port Number]" << endl;
+    if (argc != 3) {
+        cout << "Usage: " << argv[0] <<  " [Port Number]  [window size]" << endl;
         exit (-1);
     }
+
+    int windowSz = atoi(argv[2]);
 
     // For UDP connection
     struct packet_def packet;
@@ -121,7 +123,7 @@ int main(int argc, char **argv){
                 break;
             }
             long int startIdx = max(ackSeq - packet_count / 100, 1L);
-            long int endIdx = min(ackSeq + 1300, packet_count);
+            long int endIdx = min(ackSeq + windowSz, packet_count);
             for(long int i = ackSeq; i <= endIdx; i++){
                 // Determine the size and location of the requested data.
                 size_t data_offset;
