@@ -98,7 +98,10 @@ After the client has been executed, the user will be asked to provide the file n
 2. Similarly, to modify the RTT, we need to manually change the value of the macro `RTT` located at `SupremeFTP/include/NetworkAnalyzer/NetworkAnalyzer.h` , which is same place where the BUFFER_SIZE is defined. 
 
 
-
+**Notice:  The parameters (RTT , Buffer Size, Window Size)** must be properly adjusted to get optimal transmission rate.
+- RTT should be slightly greater than the real-time RTT
+- Buffer Size should be smaller than the MTU  (buffer size = MTU - 40 Bytes)
+- Window Size is explicitly passed to server as a command line parameter  
 
 
 &nbsp;
