@@ -86,6 +86,8 @@ To start the client, it takes 2 parameters
 ```
 
 After the client has been executed, the user will be asked to provide the file name that the client expect to download from the server. 
+> Notice:  There is a tiny possibility that the client will be unable to receive the packet at the start of the transmission. This occurred as a result of the loss of the first two server response packets (file size and packet number). If this occurs, simply exit and restart the client and server program. The client can receive data packets as long as the first two response packets arrive correctly.  
+
 
 &nbsp;
 
@@ -97,7 +99,7 @@ After the client has been executed, the user will be asked to provide the file n
 
 2. Similarly, to modify the RTT, we need to manually change the value of the macro `RTT` located at `SupremeFTP/include/NetworkAnalyzer/NetworkAnalyzer.h` , which is same place where the BUFFER_SIZE is defined. 
 
-
+&nbsp;
 **Notice:  The parameters (RTT , Buffer Size, Window Size)** must be properly adjusted to get optimal transmission rate.
 - RTT should be slightly greater than the real-time RTT
 - Buffer Size should be smaller than the MTU  (buffer size = MTU - 40 Bytes)
